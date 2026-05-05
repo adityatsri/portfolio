@@ -1,3 +1,9 @@
+databases:
+  - name: adhi-portfolio-db
+    databaseName: adhi_portfolio
+    user: adhi_user
+    plan: free
+
 services:
   - type: web
     name: adhi-portfolio
@@ -10,13 +16,10 @@ services:
         value: production
       - key: PORT
         value: 10000
-      - key: MONGODB_URI
-        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: adhi-portfolio-db
+          property: connectionString
       - key: JWT_SECRET
         sync: false
-      - key: CLOUDINARY_CLOUD_NAME
-        sync: false
-      - key: CLOUDINARY_API_KEY
-        sync: false
-      - key: CLOUDINARY_API_SECRET
-        sync: false
+

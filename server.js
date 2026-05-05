@@ -1,15 +1,15 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
+const db = require('./db');
 
 // ── Middleware ─────────────────────────────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL || '*', credentials: true }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 // ── API Routes ─────────────────────────────────────────────────────────────────
 app.use('/api/auth', require('./routes/auth'));
@@ -24,42 +24,80 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// ── Seed default settings ─────────────────────────────────────────────────────
-const initializeSettings = async () => {
-  try {
-    const Settings = require('./models/Settings');
-    const bcrypt = require('bcryptjs');
-    const existing = await Settings.findOne();
-    if (!existing) {
-      const hashedPassword = await bcrypt.hash('adhi@admin2024', 10);
-      await Settings.create({
-        adminPassword: hashedPassword,
-        contactEmail: 'adityatadury@gmail.com',
-        contactPhone: '+91 9999999999',
-        instagramUrl: 'https://instagram.com/adityatadury',
-        youtubeUrl: 'https://youtube.com/@adityatadury',
-        heroTitle: 'TADURY SRINIVAS ADITYA',
-        heroSubtitle: 'Videographer • Photographer • Video Editor',
-        displayName: 'Tadury Srinivas Aditya',
-      });
-      console.log('✅ Default settings created.  Default admin password: adhi@admin2024');
-    }
-  } catch (err) {
-    console.error('Settings init error:', err.message);
+// ── Create tables & seed defaults ─────────────────────────────────────────────
+const initDB = async () => {
+  const bcrypt = require('bcryptjs');
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS settings (
+      id SERIAL PRIMARY KEY,
+      admin_password TEXT NOT NULL,
+      contact_email TEXT DEFAULT 'adityatadury@gmail.com',
+      contact_phone TEXT DEFAULT '+91 9999999999',
+      instagram_url TEXT DEFAULT 'https://instagram.com/adityatadury',
+      youtube_url TEXT DEFAULT 'https://youtube.com/@adityatadury',
+      hero_title TEXT DEFAULT 'TADURY SRINIVAS ADITYA',
+      hero_subtitle TEXT DEFAULT 'Videographer • Photographer • Video Editor',
+      display_name TEXT DEFAULT 'Tadury Srinivas Aditya',
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS videos (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      title TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      category TEXT NOT NULL,
+      media_type TEXT NOT NULL,
+      media_url TEXT DEFAULT '',
+      youtube_id TEXT DEFAULT '',
+      thumbnail TEXT DEFAULT '',
+      featured BOOLEAN DEFAULT FALSE,
+      display_order INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  const { rows } = await db.query('SELECT id FROM settings LIMIT 1');
+  if (rows.length === 0) {
+    const hashed = await bcrypt.hash('adhi@admin2024', 10);
+    await db.query(
+      `INSERT INTO settings
+        (admin_password, contact_email, contact_phone, instagram_url, youtube_url,
+         hero_title, hero_subtitle, display_name)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+      [
+        hashed,
+        'adityatadury@gmail.com',
+        '+91 9999999999',
+        'https://instagram.com/adityatadury',
+        'https://youtube.com/@adityatadury',
+        'TADURY SRINIVAS ADITYA',
+        'Videographer • Photographer • Video Editor',
+        'Tadury Srinivas Aditya',
+      ]
+    );
+    console.log('✅ Default settings seeded.  Admin password: adhi@admin2024');
   }
+
+  console.log('✅ Database tables ready');
 };
 
 // ── Start server ───────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(async () => {
-    console.log('✅ MongoDB connected');
-    await initializeSettings();
+db.connect()
+  .then(async (client) => {
+    client.release();
+    console.log('✅ Postgres connected');
+    await initDB();
     app.listen(PORT, () => console.log(`✅ Server on port ${PORT}`));
   })
   .catch((err) => {
-    console.error('❌ MongoDB error:', err.message);
+    console.error('❌ Postgres error:', err.message);
     process.exit(1);
   });
+

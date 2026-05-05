@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -31,57 +31,28 @@ const UploadTab = () => {
     category: 'videographer',
     mediaType: 'youtube',
     youtubeUrl: '',
+    mediaUrl: '',
+    thumbnail: '',
     featured: false,
     order: 0,
   });
-  const [mediaFile, setMediaFile] = useState(null);
-  const [thumbFile, setThumbFile] = useState(null);
-  const [thumbPreview, setThumbPreview] = useState('');
-  const [mediaPreview, setMediaPreview] = useState('');
   const [uploading, setUploading] = useState(false);
-  const mediaRef = useRef();
-  const thumbRef = useRef();
-
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-
-  const handleMedia = (file) => {
-    if (!file) return;
-    setMediaFile(file);
-    if (file.type.startsWith('image/')) {
-      setMediaPreview(URL.createObjectURL(file));
-    } else {
-      setMediaPreview('');
-    }
-  };
-
-  const handleThumb = (file) => {
-    if (!file) return;
-    setThumbFile(file);
-    setThumbPreview(URL.createObjectURL(file));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUploading(true);
     try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-      if (mediaFile) fd.append('media', mediaFile);
-      if (thumbFile) fd.append('thumbnail', thumbFile);
-
-      await api.post('/videos', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      toast.success('✅ Content uploaded successfully!');
-
-      setForm({ title: '', description: '', category: 'videographer', mediaType: 'youtube', youtubeUrl: '', featured: false, order: 0 });
-      setMediaFile(null); setThumbFile(null); setMediaPreview(''); setThumbPreview('');
+      await api.post('/videos', form);
+      toast.success('✅ Content added successfully!');
+      setForm({ title: '', description: '', category: 'videographer', mediaType: 'youtube', youtubeUrl: '', mediaUrl: '', thumbnail: '', featured: false, order: 0 });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Upload failed');
+      toast.error(err.response?.data?.message || 'Failed to add content');
     } finally {
       setUploading(false);
     }
   };
 
-  // Auto-generate YT thumb preview
   const ytThumb = form.mediaType === 'youtube' && form.youtubeUrl
     ? (() => {
         const m = form.youtubeUrl.match(/(?:youtu\.be\/|watch\?v=|embed\/|v\/)([^#&?]{11})/);
@@ -98,62 +69,42 @@ const UploadTab = () => {
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
+      <div className="upload-hint-box">
+        <span>💡</span>
+        <span>Paste a <strong>YouTube link</strong> for videos, or paste a direct <strong>image/video URL</strong> for hosted media (Google Drive, Imgur, etc.)</span>
+      </div>
+
       <form onSubmit={handleSubmit} className="upload-form">
         <div className="form-grid-2">
-          {/* Title */}
           <div className="adm-field full">
             <label>Title *</label>
-            <input
-              className="adm-input"
-              value={form.title}
-              onChange={(e) => set('title', e.target.value)}
-              placeholder="Enter title"
-              required
-            />
+            <input className="adm-input" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Enter title" required />
           </div>
 
-          {/* Description */}
           <div className="adm-field full">
             <label>Description</label>
-            <textarea
-              className="adm-input"
-              rows={3}
-              value={form.description}
-              onChange={(e) => set('description', e.target.value)}
-              placeholder="Brief description…"
-            />
+            <textarea className="adm-input" rows={3} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Brief description…" />
           </div>
 
-          {/* Category */}
           <div className="adm-field">
             <label>Category *</label>
             <select className="adm-input" value={form.category} onChange={(e) => set('category', e.target.value)}>
-              {CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value}>{c.label}</option>
-              ))}
+              {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
 
-          {/* Media Type */}
           <div className="adm-field">
             <label>Media Type *</label>
             <div className="radio-group">
               {['youtube', 'direct'].map((t) => (
                 <label key={t} className={`radio-btn ${form.mediaType === t ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="mediaType"
-                    value={t}
-                    checked={form.mediaType === t}
-                    onChange={() => set('mediaType', t)}
-                  />
-                  {t === 'youtube' ? '▶ YouTube Link' : '📁 Upload File'}
+                  <input type="radio" name="mediaType" value={t} checked={form.mediaType === t} onChange={() => set('mediaType', t)} />
+                  {t === 'youtube' ? '▶ YouTube Link' : '🔗 Direct URL'}
                 </label>
               ))}
             </div>
           </div>
 
-          {/* YouTube URL or File upload */}
           {form.mediaType === 'youtube' ? (
             <div className="adm-field full">
               <label>YouTube URL *</label>
@@ -162,115 +113,65 @@ const UploadTab = () => {
                 value={form.youtubeUrl}
                 onChange={(e) => set('youtubeUrl', e.target.value)}
                 placeholder="https://www.youtube.com/watch?v=..."
-                required={form.mediaType === 'youtube'}
+                required
               />
               {ytThumb && (
                 <div className="thumb-preview-wrap">
                   <img src={ytThumb} alt="YT thumbnail" className="thumb-preview" onError={(e) => (e.target.style.display = 'none')} />
-                  <span className="thumb-auto-label">Auto-detected thumbnail</span>
+                  <span className="thumb-auto-label">Auto-detected thumbnail ✓</span>
                 </div>
               )}
             </div>
           ) : (
             <div className="adm-field full">
-              <label>Upload Video / Image *</label>
-              <div className="file-drop" onClick={() => mediaRef.current?.click()}>
-                {mediaPreview ? (
-                  <img src={mediaPreview} alt="preview" className="file-img-preview" />
-                ) : mediaFile ? (
-                  <div className="file-selected">
-                    <span>🎬</span>
-                    <span>{mediaFile.name}</span>
-                  </div>
-                ) : (
-                  <div className="file-placeholder">
-                    <span className="file-icon">⬆️</span>
-                    <span>Click to select video or image</span>
-                    <span className="file-hint">MP4, MOV, WebM, JPG, PNG — max 500 MB</span>
-                  </div>
-                )}
-                <input
-                  ref={mediaRef}
-                  type="file"
-                  accept="video/*,image/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => handleMedia(e.target.files[0])}
-                  required={form.mediaType === 'direct'}
-                />
-              </div>
+              <label>Media URL * <span className="field-hint-inline">(direct link to image or video)</span></label>
+              <input
+                className="adm-input"
+                value={form.mediaUrl}
+                onChange={(e) => set('mediaUrl', e.target.value)}
+                placeholder="https://example.com/video.mp4  or  https://i.imgur.com/abc.jpg"
+                required
+              />
             </div>
           )}
 
-          {/* Thumbnail (always shown for direct; optional override for YT) */}
-          {(form.mediaType === 'direct' || form.mediaType === 'youtube') && (
-            <div className="adm-field full">
-              <label>
-                Custom Thumbnail{form.mediaType === 'youtube' ? ' (optional override)' : ' *'}
-              </label>
-              <div className="file-drop small" onClick={() => thumbRef.current?.click()}>
-                {thumbPreview ? (
-                  <img src={thumbPreview} alt="thumb" className="file-img-preview" />
-                ) : (
-                  <div className="file-placeholder">
-                    <span className="file-icon">🖼️</span>
-                    <span>Click to select thumbnail</span>
-                  </div>
-                )}
-                <input
-                  ref={thumbRef}
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => handleThumb(e.target.files[0])}
-                />
+          <div className="adm-field full">
+            <label>Thumbnail URL <span className="field-hint-inline">{form.mediaType === 'youtube' ? '(optional — auto-generated from YouTube)' : '(optional)'}</span></label>
+            <input
+              className="adm-input"
+              value={form.thumbnail}
+              onChange={(e) => set('thumbnail', e.target.value)}
+              placeholder="https://example.com/thumbnail.jpg"
+            />
+            {form.thumbnail && (
+              <div className="thumb-preview-wrap">
+                <img src={form.thumbnail} alt="thumb" className="thumb-preview" onError={(e) => (e.target.style.display = 'none')} />
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Order & Featured */}
           <div className="adm-field">
             <label>Display Order</label>
-            <input
-              type="number"
-              className="adm-input"
-              value={form.order}
-              onChange={(e) => set('order', e.target.value)}
-              min={0}
-            />
+            <input type="number" className="adm-input" value={form.order} onChange={(e) => set('order', e.target.value)} min={0} />
           </div>
 
           <div className="adm-field" style={{ justifyContent: 'flex-end', paddingTop: 8 }}>
             <label className="toggle-label">
-              <input
-                type="checkbox"
-                checked={form.featured}
-                onChange={(e) => set('featured', e.target.checked)}
-              />
+              <input type="checkbox" checked={form.featured} onChange={(e) => set('featured', e.target.checked)} />
               <span className="toggle-track"><span className="toggle-knob" /></span>
               Mark as Featured (shows in Hero)
             </label>
           </div>
         </div>
 
-        <motion.button
-          type="submit"
-          className="adm-btn-primary full"
-          disabled={uploading}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          {uploading ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span className="spin-sm" /> Uploading…
-            </span>
-          ) : (
-            '⬆️ Upload Content'
-          )}
+        <motion.button type="submit" className="adm-btn-primary full" disabled={uploading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          {uploading ? <><span className="spin-sm" /> Adding…</> : '➕ Add Content'}
         </motion.button>
       </form>
     </motion.div>
   );
 };
+
 
 // ─── ManageTab ─────────────────────────────────────────────────────────────────
 const ManageTab = ({ videos, onDelete, onEdit, onRefresh }) => {
@@ -523,27 +424,22 @@ const SettingsTab = ({ initial }) => {
 
 // ─── EditModal ─────────────────────────────────────────────────────────────────
 const EditModal = ({ video, onClose, onSaved }) => {
-  const [form, setForm] = useState({ ...video });
-  const [thumbFile, setThumbFile] = useState(null);
-  const [thumbPreview, setThumbPreview] = useState(video.thumbnail || '');
+  const [form, setForm] = useState({
+    ...video,
+    youtubeUrl: video.youtubeId ? `https://www.youtube.com/watch?v=${video.youtubeId}` : '',
+  });
   const [saving, setSaving] = useState(false);
-  const thumbRef = useRef();
-
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const fd = new FormData();
-      const skip = ['_id', '__v', 'createdAt', 'updatedAt', 'cloudinaryPublicId', 'thumbnailPublicId'];
-      Object.entries(form).forEach(([k, v]) => { if (!skip.includes(k)) fd.append(k, v); });
-      if (thumbFile) fd.append('thumbnail', thumbFile);
-
-      await api.put(`/videos/${video._id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const { _id, __v, createdAt, updatedAt, cloudinaryPublicId, thumbnailPublicId, ...payload } = form;
+      await api.put(`/videos/${video._id}`, payload);
       toast.success('✅ Updated!');
       onSaved();
-    } catch (err) {
+    } catch {
       toast.error('Update failed');
     } finally {
       setSaving(false);
@@ -552,13 +448,7 @@ const EditModal = ({ video, onClose, onSaved }) => {
 
   return (
     <AnimatePresence>
-      <motion.div
-        className="edit-modal-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-      >
+      <motion.div className="edit-modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
         <motion.div
           className="edit-modal-box"
           initial={{ scale: 0.85, opacity: 0 }}
@@ -592,22 +482,25 @@ const EditModal = ({ video, onClose, onSaved }) => {
                 <label>Display Order</label>
                 <input type="number" className="adm-input" value={form.order} onChange={(e) => set('order', e.target.value)} />
               </div>
-              {form.mediaType === 'youtube' && (
+              {form.mediaType === 'youtube' ? (
                 <div className="adm-field full">
                   <label>YouTube URL</label>
-                  <input className="adm-input" value={form.youtubeUrl || `https://www.youtube.com/watch?v=${form.youtubeId}`} onChange={(e) => set('youtubeUrl', e.target.value)} />
+                  <input className="adm-input" value={form.youtubeUrl} onChange={(e) => set('youtubeUrl', e.target.value)} />
+                </div>
+              ) : (
+                <div className="adm-field full">
+                  <label>Media URL</label>
+                  <input className="adm-input" value={form.mediaUrl || ''} onChange={(e) => set('mediaUrl', e.target.value)} placeholder="https://..." />
                 </div>
               )}
               <div className="adm-field full">
-                <label>Replace Thumbnail</label>
-                <div className="file-drop small" onClick={() => thumbRef.current?.click()}>
-                  {thumbPreview ? (
-                    <img src={thumbPreview} alt="thumb" className="file-img-preview" onError={(e) => (e.target.style.display = 'none')} />
-                  ) : (
-                    <div className="file-placeholder"><span>🖼️ Click to replace thumbnail</span></div>
-                  )}
-                  <input ref={thumbRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files[0]; if (f) { setThumbFile(f); setThumbPreview(URL.createObjectURL(f)); } }} />
-                </div>
+                <label>Thumbnail URL</label>
+                <input className="adm-input" value={form.thumbnail || ''} onChange={(e) => set('thumbnail', e.target.value)} placeholder="https://..." />
+                {form.thumbnail && (
+                  <div className="thumb-preview-wrap">
+                    <img src={form.thumbnail} alt="thumb" className="thumb-preview" onError={(e) => (e.target.style.display = 'none')} />
+                  </div>
+                )}
               </div>
               <div className="adm-field">
                 <label className="toggle-label">

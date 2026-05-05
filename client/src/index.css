@@ -1190,6 +1190,20 @@ input[type=checkbox]:checked + .toggle-track .toggle-knob { transform: translate
 /* ─ Upload Form ─ */
 .upload-form { max-width: 760px; }
 
+.upload-hint-box {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: rgba(0,170,255,0.08);
+  border: 1px solid rgba(0,170,255,0.2);
+  border-radius: 8px; padding: 14px 16px;
+  font-size: 0.85rem; color: var(--text2);
+  margin-bottom: 24px; line-height: 1.5;
+}
+.upload-hint-box strong { color: var(--blue); }
+
+.field-hint-inline {
+  font-size: 0.75rem; font-weight: 400; color: var(--text3); margin-left: 4px;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    RESPONSIVE TWEAKS
    ═══════════════════════════════════════════════════════════════════════════ */

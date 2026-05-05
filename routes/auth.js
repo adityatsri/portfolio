@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const Settings = require('../models/Settings');
+const db = require('../db');
 const auth = require('../middleware/auth');
 
 // POST /api/auth/login
@@ -11,10 +11,10 @@ router.post('/login', async (req, res) => {
     const { password } = req.body;
     if (!password) return res.status(400).json({ message: 'Password is required' });
 
-    const settings = await Settings.findOne();
-    if (!settings) return res.status(500).json({ message: 'Settings not found' });
+    const { rows } = await db.query('SELECT admin_password FROM settings LIMIT 1');
+    if (!rows.length) return res.status(500).json({ message: 'Settings not found' });
 
-    const isMatch = await bcrypt.compare(password, settings.adminPassword);
+    const isMatch = await bcrypt.compare(password, rows[0].admin_password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid password' });
 
     const token = jwt.sign({ role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -29,3 +29,4 @@ router.post('/login', async (req, res) => {
 router.get('/verify', auth, (_req, res) => res.json({ valid: true }));
 
 module.exports = router;
+
