@@ -1,19 +1,8 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["client/build/**"]
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/server.js"
-    }
+  "outputDirectory": "client/build",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" }
   ]
 }
