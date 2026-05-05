@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../db');
 const auth = require('../middleware/auth');
 
+//dummy
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
