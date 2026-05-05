@@ -16,8 +16,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/videos', require('./routes/videos'));
 app.use('/api/settings', require('./routes/settings'));
 
-// ── Serve React build in production (local only; Vercel handles static via CDN) ─
-if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+// ── Serve React build in production ──────────────────────────────────────────
+if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client/build')));
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
