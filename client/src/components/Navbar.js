@@ -57,8 +57,9 @@ const Navbar = ({ settings, videos = [] }) => {
           ))}
         </ul>
 
-        {/* Hamburger only on mobile */}
+        {/* Admin button + Hamburger */}
         <div className="navbar-right">
+          <Link to="/admin" className="nav-admin-btn">Admin</Link>
           <button
             className="hamburger"
             onClick={() => setMenuOpen((o) => !o)}
@@ -91,6 +92,9 @@ const Navbar = ({ settings, videos = [] }) => {
                 {link.label}
               </a>
             ))}
+            <Link to="/admin" className="mobile-link" onClick={() => setMenuOpen(false)}>
+              Admin
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
@@ -99,4 +103,3 @@ const Navbar = ({ settings, videos = [] }) => {
 };
 
 export default Navbar;
-
