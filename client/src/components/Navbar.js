@@ -100,4 +100,3 @@ const Navbar = ({ settings, videos = [] }) => {
 
 export default Navbar;
 
-  return (
