@@ -13,6 +13,11 @@ const CATEGORY_COLORS = {
   instagram_reel: '#e1306c',
   instagram_post: '#a855f7',
   personal_photo: '#10b981',
+  videographer:   '#E50914',
+  photographer:   '#00aaff',
+  video_editing:  '#a855f7',
+  youtube:        '#E50914',
+  direct:         '#10b981',
 };
 
 const CATEGORY_LABELS = {
@@ -22,6 +27,11 @@ const CATEGORY_LABELS = {
   instagram_reel: 'Instagram Reel',
   instagram_post: 'Instagram Post',
   personal_photo: 'Personal Photo',
+  videographer:   'Videographer',
+  photographer:   'Photographer',
+  video_editing:  'Video Editing',
+  youtube:        'YouTube',
+  direct:         'Direct',
 };
 
 const CATEGORY_BADGES = {
@@ -31,6 +41,11 @@ const CATEGORY_BADGES = {
   instagram_reel: 'REEL',
   instagram_post: 'POST',
   personal_photo: 'PHOTO',
+  videographer:   'VID',
+  photographer:   'PHOTO',
+  video_editing:  'EDIT',
+  youtube:        'YT',
+  direct:         'FILE',
 };
 
 const VideoCard = ({ video, index, onSelect }) => {

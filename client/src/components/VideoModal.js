@@ -9,6 +9,9 @@ const CATEGORY_LABELS = {
   instagram_reel: 'Instagram Reel',
   instagram_post: 'Instagram Post',
   personal_photo: 'Personal Photo',
+  videographer:   'Videographer',
+  photographer:   'Photographer',
+  video_editing:  'Video Editing',
 };
 
 const VideoModal = ({ video, onClose }) => {
@@ -23,11 +26,14 @@ const VideoModal = ({ video, onClose }) => {
   }, [onClose]);
 
   const cat = video.category || video.mediaType;
-  const isYoutubeVideo = cat === 'youtube_video';
+  // New categories + legacy categories (videographer, video_editing = YouTube; photographer = image/direct)
   const isYoutubeShort = cat === 'youtube_short';
-  const isYoutube      = isYoutubeVideo || isYoutubeShort;
+  const isYoutube      = cat === 'youtube_video' || cat === 'youtube_short'
+                      || cat === 'videographer'  || cat === 'video_editing'
+                      || cat === 'youtube';
   const isDriveVideo   = cat === 'personal_video';
   const isDrivePhoto   = cat === 'personal_photo';
+  const isLegacyDirect = cat === 'photographer'  || cat === 'direct';
   const isInstagram    = cat === 'instagram_reel' || cat === 'instagram_post';
 
   const ytUrl = video.youtubeId
@@ -79,7 +85,7 @@ const VideoModal = ({ video, onClose }) => {
               />
             )}
 
-            {isDrivePhoto && (
+            {(isDrivePhoto || isLegacyDirect) && (
               <img
                 src={video.mediaUrl}
                 alt={video.title}
