@@ -60,6 +60,10 @@ const Home = () => {
         <VideoRow title="Instagram Reels" category="instagram_reel" videos={byCategory('instagram_reel')} onVideoSelect={setSelectedVideo} />
         <VideoRow title="Instagram Posts" category="instagram_post" videos={byCategory('instagram_post')} onVideoSelect={setSelectedVideo} />
         <VideoRow title="Personal Photos" category="personal_photo" videos={byCategory('personal_photo')} onVideoSelect={setSelectedVideo} />
+        {/* Legacy categories — videos uploaded before the 6-type update */}
+        <VideoRow title="Videographer"  category="videographer"  videos={byCategory('videographer')}  onVideoSelect={setSelectedVideo} />
+        <VideoRow title="Photographer"  category="photographer"  videos={byCategory('photographer')}  onVideoSelect={setSelectedVideo} />
+        <VideoRow title="Video Editing" category="video_editing" videos={byCategory('video_editing')} onVideoSelect={setSelectedVideo} />
 
         {videos.length === 0 && (
           <motion.div

@@ -9,6 +9,10 @@ const CATEGORY_ICONS = {
   instagram_reel: '🎦',
   instagram_post: '📷',
   personal_photo: '🖼️',
+  // legacy
+  videographer:   '🎬',
+  photographer:   '📸',
+  video_editing:  '✂️',
 };
 
 const VideoRow = ({ title, category, videos, onVideoSelect }) => {
