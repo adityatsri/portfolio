@@ -647,6 +647,20 @@ input, textarea, select { font-family: inherit; }
   letter-spacing: 1px;
 }
 
+.contact-profile-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.contact-profile-pic {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 28px rgba(229, 9, 20, 0.45);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    FOOTER
    ═══════════════════════════════════════════════════════════════════════════ */

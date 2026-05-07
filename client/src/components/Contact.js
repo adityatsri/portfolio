@@ -66,6 +66,22 @@ const Contact = ({ settings }) => {
           viewport={{ once: true }}
           transition={{ duration: 0.65 }}
         >
+          {settings?.profilePicUrl && (
+            <motion.div
+              className="contact-profile-wrap"
+              initial={{ opacity: 0, scale: 0.7 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55 }}
+            >
+              <img
+                src={settings.profilePicUrl}
+                alt={settings?.displayName || 'Tadury Srinivas Aditya'}
+                className="contact-profile-pic"
+                onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none'; }}
+              />
+            </motion.div>
+          )}
           <span className="section-eyebrow">GET IN TOUCH</span>
           <h2 className="section-heading">Let's Create Together</h2>
           <p className="section-sub">
