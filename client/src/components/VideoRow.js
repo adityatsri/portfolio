@@ -3,9 +3,12 @@ import { motion } from 'framer-motion';
 import VideoCard from './VideoCard';
 
 const CATEGORY_ICONS = {
-  videographer: '🎬',
-  photographer: '📸',
-  video_editing: '✂️',
+  youtube_video:  '▶',
+  youtube_short:  '📱',
+  personal_video: '🎥',
+  instagram_reel: '🎦',
+  instagram_post: '📷',
+  personal_photo: '🖼️',
 };
 
 const VideoRow = ({ title, category, videos, onVideoSelect }) => {

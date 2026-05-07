@@ -453,7 +453,7 @@ input, textarea, select { font-family: inherit; }
   padding: 2px 6px; border-radius: 3px;
   line-height: 1;
 }
-.vcard-badge.yt   { top: 6px; left: 6px; background: var(--red); color: #fff; }
+.vcard-badge.type-badge { top: 6px; left: 6px; color: #fff; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 3px; }
 .vcard-badge.star { top: 6px; right: 6px; background: var(--gold); color: #000; }
 
 /* Hover overlay */
@@ -1208,9 +1208,6 @@ input[type=checkbox]:checked + .toggle-track .toggle-knob { transform: translate
    RESPONSIVE TWEAKS
    ═══════════════════════════════════════════════════════════════════════════ */
 @media(max-width: 600px) {
-  .hero-content { padding: 0 6% 0 6%; }
-  .hero-actions { flex-direction: column; }
-  .btn-play, .btn-outline { justify-content: center; }
   .login-card { padding: 36px 28px; }
   .admin-content { padding: 16px; }
   .modal-box { border-radius: 8px 8px 0 0; align-self: flex-end; }
@@ -1221,3 +1218,240 @@ input[type=checkbox]:checked + .toggle-track .toggle-knob { transform: translate
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEW CONTENT TYPES — Modal extensions
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* YouTube Shorts — portrait modal */
+.modal-box-portrait {
+  max-width: 400px !important;
+}
+.modal-media-portrait {
+  aspect-ratio: 9 / 16 !important;
+}
+
+/* Drive video iframe */
+.modal-drive-frame {
+  width: 100%; height: 100%;
+  border: none; display: block;
+}
+
+/* Instagram — can't embed, show open button */
+.modal-ig-block {
+  width: 100%; height: 100%;
+  min-height: 260px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px;
+  background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+  padding: 40px 24px;
+}
+.modal-ig-thumb {
+  width: 100%; max-height: 260px;
+  object-fit: contain; border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.modal-ig-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.95); color: #1a1a1a;
+  font-size: 0.95rem; font-weight: 700;
+  padding: 14px 28px; border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+.modal-ig-btn:hover { background: #fff; transform: translateY(-2px); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADMIN — New UI elements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar avatar / profile pic */
+.sidebar-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--red);
+  flex-shrink: 0;
+}
+
+/* Topbar profile area */
+.topbar-profile {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.topbar-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--red);
+}
+
+/* Profile picture preview in settings */
+.profile-preview {
+  width: 80px; height: 80px;
+  border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+/* Content type grid (6-button selector in upload form) */
+.cat-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+@media(max-width: 600px) {
+  .cat-type-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width: 380px) {
+  .cat-type-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.cat-type-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 5px; padding: 12px 8px;
+  border-radius: 8px; border: 1.5px solid var(--border);
+  background: var(--surface); cursor: pointer;
+  font-size: 0.78rem; font-weight: 600; color: var(--text2);
+  transition: all 0.18s; text-align: center;
+  user-select: none;
+}
+.cat-type-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+.cat-type-btn.active { font-weight: 700; }
+.cat-type-btn input { display: none; }
+.ctb-icon { font-size: 1.3rem; }
+.ctb-label { font-size: 0.72rem; line-height: 1.2; }
+
+/* mc-type-badge now uses inline style for color */
+.mc-type-badge { color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile / Tablet
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Phone portrait (≤ 480px): sidebar becomes bottom nav ── */
+@media(max-width: 480px) {
+  .admin-layout { flex-direction: column; }
+
+  .admin-sidebar {
+    width: 100% !important;
+    height: 58px;
+    position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+    z-index: 100;
+    flex-direction: row;
+    border-right: none; border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .sidebar-logo  { display: none; }
+  .sidebar-stats { display: none; }
+
+  .sidebar-nav {
+    flex-direction: row; flex: 1;
+    padding: 0; gap: 0;
+    justify-content: space-around; align-items: stretch;
+    border-bottom: none;
+  }
+  .sidebar-btn {
+    flex-direction: column; gap: 2px;
+    padding: 6px 4px; font-size: 0.6rem;
+    border-radius: 0; flex: 1;
+    justify-content: center; align-items: center;
+    min-width: 0;
+  }
+  .sidebar-btn span:last-child:not(.sb-icon) { display: block !important; font-size: 0.6rem; }
+  .sb-icon { font-size: 1.1rem; }
+  .sb-active-bar { display: none; }
+
+  .sidebar-footer {
+    flex-direction: row;
+    padding: 0; border-top: none;
+    border-left: 1px solid var(--border);
+  }
+  .sidebar-footer .sidebar-btn { padding: 6px 4px; }
+
+  .admin-main { padding-bottom: 58px; }
+  .admin-content { padding: 12px; }
+  .admin-topbar { padding: 14px 12px 10px; flex-wrap: nowrap; }
+  .admin-page-title { font-size: 1rem; }
+  .admin-page-sub { display: none; }
+}
+
+/* ── Small tablet (481px – 768px): narrow sidebar ── */
+@media(min-width: 481px) and (max-width: 768px) {
+  .admin-sidebar { width: 72px; }
+  .sl-label { display: none; }
+  .sidebar-stats { display: none; }
+  .sidebar-btn span:last-child:not(.sb-icon) { display: none; }
+  .sidebar-logo { justify-content: center; }
+  .admin-content { padding: 16px; }
+}
+
+/* ── Manage grid responsive ── */
+@media(max-width: 480px) {
+  .manage-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .manage-toolbar { flex-direction: column; align-items: stretch; }
+  .search-input { max-width: 100%; }
+  .filter-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+  .filter-tab { white-space: nowrap; flex-shrink: 0; font-size: 0.72rem; padding: 5px 10px; }
+}
+@media(max-width: 360px) {
+  .manage-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Edit modal full-screen on mobile ── */
+@media(max-width: 600px) {
+  .edit-modal-backdrop { padding: 0; align-items: flex-end; }
+  .edit-modal-box { border-radius: 16px 16px 0 0; max-height: 92vh; max-width: 100%; }
+  .edit-form { padding: 16px; }
+}
+
+/* ── Upload / settings form single column on mobile ── */
+@media(max-width: 600px) {
+  .form-grid-2 { grid-template-columns: 1fr; }
+  .upload-form { max-width: 100%; }
+  .settings-form { max-width: 100%; }
+  .settings-section { padding: 16px; }
+}
+
+/* ── Admin topbar on small screens ── */
+@media(max-width: 600px) {
+  .admin-topbar { padding: 14px 16px; }
+  .admin-page-title { font-size: 1.1rem; }
+}
+
+/* ── Hero responsive ── */
+@media(max-width: 480px) {
+  .hero-title { font-size: 2rem; }
+  .hero-subtitle { font-size: 0.9rem; }
+  .hero-actions { flex-direction: column; }
+  .btn-play, .btn-outline { justify-content: center; width: 100%; }
+  .hero-content { padding: 0 5% 0 5%; margin-top: 56px; }
+}
+
+/* ── Video rows on mobile ── */
+@media(max-width: 480px) {
+  .vcard { width: clamp(130px, 42vw, 180px); }
+  .row-header { padding: 0 4% 10px; }
+}
+
+/* ── Modal responsive ── */
+@media(max-width: 600px) {
+  .modal-backdrop { padding: 0; align-items: flex-end; }
+  .modal-box { border-radius: 16px 16px 0 0; max-height: 95vh; overflow-y: auto; }
+  .modal-box-portrait { max-width: 100% !important; border-radius: 16px 16px 0 0; }
+}
+
+/* ── Contact section responsive ── */
+@media(max-width: 600px) {
+  .contact-section { padding: 60px 5% 40px; }
+  .contact-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .contact-card { padding: 24px 12px; }
+}
+@media(max-width: 380px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Login card responsive ── */
+@media(max-width: 480px) {
+  .login-card { padding: 36px 20px; }
+}
+

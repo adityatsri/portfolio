@@ -54,24 +54,12 @@ const Home = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.6 }}
       >
-        <VideoRow
-          title="Videographer"
-          category="videographer"
-          videos={byCategory('videographer')}
-          onVideoSelect={setSelectedVideo}
-        />
-        <VideoRow
-          title="Photographer"
-          category="photographer"
-          videos={byCategory('photographer')}
-          onVideoSelect={setSelectedVideo}
-        />
-        <VideoRow
-          title="Video Editing"
-          category="video_editing"
-          videos={byCategory('video_editing')}
-          onVideoSelect={setSelectedVideo}
-        />
+        <VideoRow title="YouTube Videos"  category="youtube_video"  videos={byCategory('youtube_video')}  onVideoSelect={setSelectedVideo} />
+        <VideoRow title="YouTube Shorts"  category="youtube_short"  videos={byCategory('youtube_short')}  onVideoSelect={setSelectedVideo} />
+        <VideoRow title="Personal Videos" category="personal_video" videos={byCategory('personal_video')} onVideoSelect={setSelectedVideo} />
+        <VideoRow title="Instagram Reels" category="instagram_reel" videos={byCategory('instagram_reel')} onVideoSelect={setSelectedVideo} />
+        <VideoRow title="Instagram Posts" category="instagram_post" videos={byCategory('instagram_post')} onVideoSelect={setSelectedVideo} />
+        <VideoRow title="Personal Photos" category="personal_photo" videos={byCategory('personal_photo')} onVideoSelect={setSelectedVideo} />
 
         {videos.length === 0 && (
           <motion.div

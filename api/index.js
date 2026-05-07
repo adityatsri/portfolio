@@ -26,10 +26,13 @@ const ensureDB = async () => {
         hero_title TEXT DEFAULT 'TADURY SRINIVAS ADITYA',
         hero_subtitle TEXT DEFAULT 'Videographer • Photographer • Video Editor',
         display_name TEXT DEFAULT 'Tadury Srinivas Aditya',
+        profile_pic_url TEXT DEFAULT '',
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       )
     `);
+    // Add column if upgrading an existing table
+    await db.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS profile_pic_url TEXT DEFAULT ''`);
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS videos (

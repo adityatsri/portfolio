@@ -12,13 +12,14 @@ const ROW_TO_OBJ = (r) => ({
   heroTitle:     r.hero_title,
   heroSubtitle:  r.hero_subtitle,
   displayName:   r.display_name,
+  profilePicUrl: r.profile_pic_url || '',
 });
 
 // GET /api/settings  (public)
 router.get('/', async (_req, res) => {
   try {
     const { rows } = await db.query(
-      'SELECT contact_email,contact_phone,instagram_url,youtube_url,hero_title,hero_subtitle,display_name FROM settings LIMIT 1'
+      'SELECT contact_email,contact_phone,instagram_url,youtube_url,hero_title,hero_subtitle,display_name,profile_pic_url FROM settings LIMIT 1'
     );
     if (!rows.length) return res.status(404).json({ message: 'Not found' });
     res.json(ROW_TO_OBJ(rows[0]));
@@ -32,7 +33,7 @@ router.put('/', auth, async (req, res) => {
   try {
     const {
       contactEmail, contactPhone, instagramUrl, youtubeUrl,
-      heroTitle, heroSubtitle, displayName,
+      heroTitle, heroSubtitle, displayName, profilePicUrl,
       currentPassword, newPassword,
     } = req.body;
 
@@ -50,19 +51,21 @@ router.put('/', auth, async (req, res) => {
 
     const { rows: updated } = await db.query(
       `UPDATE settings SET
-        contact_email  = COALESCE($1, contact_email),
-        contact_phone  = COALESCE($2, contact_phone),
-        instagram_url  = COALESCE($3, instagram_url),
-        youtube_url    = COALESCE($4, youtube_url),
-        hero_title     = COALESCE($5, hero_title),
-        hero_subtitle  = COALESCE($6, hero_subtitle),
-        display_name   = COALESCE($7, display_name),
-        admin_password = $8,
-        updated_at     = NOW()
-       WHERE id = $9
-       RETURNING contact_email,contact_phone,instagram_url,youtube_url,hero_title,hero_subtitle,display_name`,
+        contact_email   = COALESCE($1, contact_email),
+        contact_phone   = COALESCE($2, contact_phone),
+        instagram_url   = COALESCE($3, instagram_url),
+        youtube_url     = COALESCE($4, youtube_url),
+        hero_title      = COALESCE($5, hero_title),
+        hero_subtitle   = COALESCE($6, hero_subtitle),
+        display_name    = COALESCE($7, display_name),
+        admin_password  = $8,
+        profile_pic_url = COALESCE($9, profile_pic_url),
+        updated_at      = NOW()
+       WHERE id = $10
+       RETURNING contact_email,contact_phone,instagram_url,youtube_url,hero_title,hero_subtitle,display_name,profile_pic_url`,
       [contactEmail||null, contactPhone||null, instagramUrl||null, youtubeUrl||null,
-       heroTitle||null, heroSubtitle||null, displayName||null, newHash, rows[0].id]
+       heroTitle||null, heroSubtitle||null, displayName||null, newHash,
+       profilePicUrl !== undefined ? profilePicUrl : null, rows[0].id]
     );
     res.json(ROW_TO_OBJ(updated[0]));
   } catch (err) {
