@@ -44,7 +44,7 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      <Navbar settings={settings} />
+      <Navbar settings={settings} videos={videos} />
 
       <Hero videos={videos} settings={settings} onVideoSelect={setSelectedVideo} />
 
