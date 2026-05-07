@@ -28,6 +28,7 @@ const extractDriveId = (url) => {
 
 const driveEmbedUrl = (id) => `https://drive.google.com/file/d/${id}/preview`;
 const driveThumbUrl = (id) => `https://drive.google.com/thumbnail?id=${id}&sz=w640`;
+const driveFullUrl  = (id) => `https://drive.google.com/thumbnail?id=${id}&sz=w1280`;
 const driveViewUrl  = (id) => `https://drive.google.com/uc?export=view&id=${id}`;
 
 const normalizeThumbnail = (thumbUrl) => {
@@ -114,7 +115,8 @@ router.post('/', auth, async (req, res) => {
     } else if (category === 'personal_photo') {
       const driveId = extractDriveId(driveUrl);
       if (!driveId) return res.status(400).json({ message: 'Invalid Google Drive link. Share the file and paste the sharing URL.' });
-      finalMediaUrl = driveViewUrl(driveId);
+      finalMediaUrl = driveFullUrl(driveId);
+      if (!finalThumbnail) finalThumbnail = driveThumbUrl(driveId);
 
     } else if (category === 'instagram_reel' || category === 'instagram_post') {
       if (!instagramUrl || !instagramUrl.includes('instagram.com')) {
@@ -184,10 +186,12 @@ router.put('/:id', auth, async (req, res) => {
     } else if (newCategory === 'personal_photo') {
       if (driveUrl) {
         const driveId = extractDriveId(driveUrl);
-        if (driveId) newMediaUrl = driveViewUrl(driveId);
+        if (driveId) {
+          newMediaUrl = driveFullUrl(driveId);
+          if (thumbnail === undefined || thumbnail === '') newThumbnail = driveThumbUrl(driveId);
+        }
       }
       newYoutubeId = '';
-      if (thumbnail === undefined) newThumbnail = '';
 
     } else if (newCategory === 'instagram_reel' || newCategory === 'instagram_post') {
       if (instagramUrl) newMediaUrl = instagramUrl;
