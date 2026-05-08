@@ -1,6 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+// Convert old broken Drive thumbnail URLs to public lh3 CDN format
+const fixProfilePicUrl = (url) => {
+  if (!url) return url;
+  const m = url.match(/drive\.google\.com\/thumbnail\?id=([^&]+)/);
+  return m ? `https://lh3.googleusercontent.com/d/${m[1]}` : url;
+};
+
 const Contact = ({ settings }) => {
   const cards = [
     {
@@ -75,7 +82,7 @@ const Contact = ({ settings }) => {
               transition={{ duration: 0.55 }}
             >
               <img
-                src={settings.profilePicUrl}
+                src={fixProfilePicUrl(settings.profilePicUrl)}
                 alt={settings?.displayName || 'Tadury Srinivas Aditya'}
                 className="contact-profile-pic"
                 onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none'; }}

@@ -297,9 +297,9 @@ const SettingsTab = ({ initial, onSaved }) => {
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const setProfilePic = (url) => {
-    // Auto-convert Drive sharing links to a direct image URL
+    // Convert Drive sharing link → public lh3 CDN (works without Google login)
     const driveId = extractDriveIdFE(url);
-    const finalUrl = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w400` : url;
+    const finalUrl = driveId ? `https://lh3.googleusercontent.com/d/${driveId}` : url;
     set('profilePicUrl', finalUrl);
   };
 

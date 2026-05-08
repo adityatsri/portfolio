@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import VideoCard from './VideoCard';
 
-const MotionLink = motion(Link);
-
 const CATEGORY_ICONS = {
   youtube_video:  '▶',
   youtube_short:  '📱',
@@ -62,13 +60,9 @@ const VideoRow = ({ title, category, videos, onVideoSelect }) => {
           <h2 className="row-title">{title}</h2>
           <span className="row-count">{videos.length} items</span>
         </div>
-        <MotionLink
-          className="row-see-all"
-          to={`/category/${category}`}
-          whileHover={{ x: 6 }}
-        >
+        <Link className="row-see-all" to={`/category/${category}`}>
           See All →
-        </MotionLink>
+        </Link>
       </div>
 
       <div className="row-track-wrap">
