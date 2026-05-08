@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactPlayer from 'react-player';
 
@@ -9,12 +9,15 @@ const CATEGORY_LABELS = {
   instagram_reel: 'Instagram Reel',
   instagram_post: 'Instagram Post',
   personal_photo: 'Personal Photo',
+  // legacy
   videographer:   'Videographer',
   photographer:   'Photographer',
   video_editing:  'Video Editing',
 };
 
 const VideoModal = ({ video, onClose }) => {
+  const [photoFullscreen, setPhotoFullscreen] = useState(false);
+
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     const onKey = (e) => e.key === 'Escape' && onClose();
@@ -26,14 +29,11 @@ const VideoModal = ({ video, onClose }) => {
   }, [onClose]);
 
   const cat = video.category || video.mediaType;
-  // New categories + legacy categories (videographer, video_editing = YouTube; photographer = image/direct)
+  const isYoutubeVideo = cat === 'youtube_video' || cat === 'videographer' || cat === 'video_editing';
   const isYoutubeShort = cat === 'youtube_short';
-  const isYoutube      = cat === 'youtube_video' || cat === 'youtube_short'
-                      || cat === 'videographer'  || cat === 'video_editing'
-                      || cat === 'youtube';
+  const isYoutube      = isYoutubeVideo || isYoutubeShort;
   const isDriveVideo   = cat === 'personal_video';
-  const isDrivePhoto   = cat === 'personal_photo';
-  const isLegacyDirect = cat === 'photographer'  || cat === 'direct';
+  const isDrivePhoto   = cat === 'personal_photo' || cat === 'photographer';
   const isInstagram    = cat === 'instagram_reel' || cat === 'instagram_post';
 
   const ytUrl = video.youtubeId
@@ -52,7 +52,7 @@ const VideoModal = ({ video, onClose }) => {
         onClick={onClose}
       >
         <motion.div
-          className={`modal-box${isYoutubeShort ? ' modal-box-portrait' : ''}`}
+          className={`modal-box${isYoutubeShort ? ' modal-box-portrait' : ''}${isDrivePhoto && photoFullscreen ? ' modal-photo-fullscreen' : ''}`}
           initial={{ scale: 0.75, opacity: 0, y: 60 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.75, opacity: 0, y: 40 }}
@@ -61,8 +61,8 @@ const VideoModal = ({ video, onClose }) => {
         >
           <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
-          {/* ── Media ── */}
-          <div className={`modal-media${isYoutubeShort ? ' modal-media-portrait' : ''}`}>
+          {/* Media */}
+          <div className={`modal-media${isYoutubeShort ? ' modal-media-portrait' : ''}${isDrivePhoto && photoFullscreen ? ' modal-media-photo-fs' : ''}`}>
 
             {isYoutube && ytUrl && (
               <ReactPlayer
@@ -85,12 +85,23 @@ const VideoModal = ({ video, onClose }) => {
               />
             )}
 
-            {(isDrivePhoto || isLegacyDirect) && (
-              <img
-                src={video.mediaUrl}
-                alt={video.title}
-                className="modal-full-img"
-              />
+            {isDrivePhoto && (
+              <>
+                <img
+                  src={video.mediaUrl}
+                  alt={video.title}
+                  className="modal-full-img"
+                />
+                <button
+                  className="photo-fs-btn"
+                  onClick={() => setPhotoFullscreen((f) => !f)}
+                  aria-label={photoFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                  title={photoFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                >
+                  {photoFullscreen ? '⊟' : '⛶'}
+                  <span className="photo-fs-label">{photoFullscreen ? 'Shrink' : 'Fullscreen'}</span>
+                </button>
+              </>
             )}
 
             {isInstagram && (
@@ -116,21 +127,23 @@ const VideoModal = ({ video, onClose }) => {
             )}
           </div>
 
-          {/* ── Info ── */}
-          <div className="modal-info">
-            <div className="modal-info-top">
-              <h2 className="modal-title">{video.title}</h2>
-              <div className="modal-tags">
-                <span className="modal-tag cat">
-                  {CATEGORY_LABELS[cat] || cat}
-                </span>
-                {video.featured && <span className="modal-tag feat">★ Featured</span>}
+          {/* Info - hidden in photo fullscreen */}
+          {!(isDrivePhoto && photoFullscreen) && (
+            <div className="modal-info">
+              <div className="modal-info-top">
+                <h2 className="modal-title">{video.title}</h2>
+                <div className="modal-tags">
+                  <span className="modal-tag cat">
+                    {CATEGORY_LABELS[cat] || cat}
+                  </span>
+                  {video.featured && <span className="modal-tag feat">★ Featured</span>}
+                </div>
               </div>
+              {video.description && (
+                <p className="modal-desc">{video.description}</p>
+              )}
             </div>
-            {video.description && (
-              <p className="modal-desc">{video.description}</p>
-            )}
-          </div>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>

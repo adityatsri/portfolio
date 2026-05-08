@@ -558,8 +558,11 @@ const AdminDashboard = () => {
   const [settings, setSettings] = useState(null);
   const [editingVideo, setEditingVideo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profilePicError, setProfilePicError] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => { setProfilePicError(false); }, [settings?.profilePicUrl]);
 
   const fetchData = async () => {
     try {
@@ -615,8 +618,8 @@ const AdminDashboard = () => {
       {/* ── Sidebar ── */}
       <aside className="admin-sidebar">
         <div className="sidebar-logo">
-          {settings?.profilePicUrl ? (
-            <img src={settings.profilePicUrl} alt="Admin" className="sidebar-avatar" onError={(e) => { e.target.style.display = 'none'; }} />
+          {settings?.profilePicUrl && !profilePicError ? (
+            <img src={settings.profilePicUrl} alt="Admin" className="sidebar-avatar" onError={() => setProfilePicError(true)} />
           ) : (
             <span className="sl-badge">TSA</span>
           )}
@@ -670,8 +673,8 @@ const AdminDashboard = () => {
             </p>
           </div>
           <div className="topbar-profile">
-            {settings?.profilePicUrl && (
-              <img src={settings.profilePicUrl} alt="Admin" className="topbar-avatar" onError={(e) => (e.target.style.display = 'none')} />
+            {settings?.profilePicUrl && !profilePicError && (
+              <img src={settings.profilePicUrl} alt="Admin" className="topbar-avatar" onError={() => setProfilePicError(true)} />
             )}
             <span className="admin-topbar-badge">Admin</span>
           </div>

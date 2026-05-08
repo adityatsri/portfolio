@@ -57,7 +57,7 @@ const Navbar = ({ settings, videos = [] }) => {
           ))}
         </ul>
 
-        {/* Admin button + Hamburger */}
+        {/* Admin + Hamburger */}
         <div className="navbar-right">
           <Link to="/admin" className="nav-admin-btn">Admin</Link>
           <button
@@ -92,8 +92,80 @@ const Navbar = ({ settings, videos = [] }) => {
                 {link.label}
               </a>
             ))}
-            <Link to="/admin" className="mobile-link" onClick={() => setMenuOpen(false)}>
-              Admin
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
+  );
+};
+
+export default Navbar;
+
+  return (
+    <motion.nav
+      className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
+      <div className="navbar-inner">
+        {/* Logo */}
+        <Link to="/" className="navbar-logo">
+          <span className="logo-badge">TSA</span>
+          <span className="logo-name">{settings?.displayName || 'Tadury Srinivas Aditya'}</span>
+        </Link>
+
+        {/* Desktop Links */}
+        <ul className="navbar-links">
+          {navLinks.map((link) => (
+            <li key={link.label}>
+              <a href={link.href} className="nav-link">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {/* Right side */}
+        <div className="navbar-right">
+          <Link to="/admin" className="nav-admin-btn">
+            Admin
+          </Link>
+          {/* Hamburger */}
+          <button
+            className="hamburger"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="Menu"
+          >
+            <span className={`ham-line ${menuOpen ? 'open' : ''}`} />
+            <span className={`ham-line ${menuOpen ? 'open' : ''}`} />
+            <span className={`ham-line ${menuOpen ? 'open' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            className="mobile-menu"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="mobile-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+            <Link to="/admin" className="mobile-link admin" onClick={() => setMenuOpen(false)}>
+              Admin Portal
             </Link>
           </motion.div>
         )}
